@@ -212,28 +212,30 @@ const ReportIssueForm = () => {
   const handleRemoveFile = () => setFile(null);
 
   // --- Submit Form ---
+  // --- Submit Form ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!token) return toast.error("You must be logged in.");
-    if (!title.trim()) return toast.error("Please provide a title.");
     if (!selectedIssue) return toast.error("Please select a category.");
+    if (!title.trim()) return toast.error("Please provide a title.");
     if (!description.trim())
       return toast.error("Please provide a description.");
 
+    // Construct location object
     const locationField = {
-      name: locationInput.trim() || "Unknown location",
+      name: locationInput || "Not provided",
       latitude: locationCoords?.lat || null,
       longitude: locationCoords?.lng || null,
     };
 
     const formData = new FormData();
     formData.append("title", title.trim());
-    formData.append("category", selectedIssue); // renamed field
+    formData.append("category", selectedIssue); // send as category
     formData.append("description", description.trim());
-    formData.append("location", JSON.stringify(locationField));
+    formData.append("location", JSON.stringify(locationField)); // stringify object
     if (email) formData.append("email", email);
     formData.append("notifyByEmail", notifyByEmail);
-    formData.append("status", "Pending");
     if (file) formData.append("file", file);
 
     setLoading(true);
@@ -248,6 +250,8 @@ const ReportIssueForm = () => {
       console.log("Submitted:", data);
       setReportSubmitted(true);
       toast.success("Report submitted successfully!");
+
+      // Reset form
       setTitle("");
       setSelectedIssue("");
       setDescription("");
@@ -255,6 +259,7 @@ const ReportIssueForm = () => {
       setLocationInput("");
       setLocationCoords(null);
       setNotifyByEmail(false);
+
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to submit report.";

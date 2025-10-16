@@ -6,8 +6,8 @@ const issueSchema = new mongoose.Schema({
   description: { type: String, required: true },
   location: {
     name: { type: String, required: true },
-    lat: { type: Number },
-    lng: { type: Number },
+    latitude: { type: Number },
+    longitude: { type: Number },
   },
   phone: String,
   email: String,
