@@ -10,7 +10,7 @@ import IssueDetail from "./pages/IssueDetails";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/">
       <Toaster richColors position="bottom-right" />
       <Routes>
         <Route path="/" element={<Dashboard />} />
