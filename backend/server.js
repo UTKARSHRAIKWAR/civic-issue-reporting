@@ -30,8 +30,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://civix-phi.vercel.app/login",
-      "https://civix-phi.vercel.app/signup",
+      "https://civic-issue-reporting-rqx6.vercel.app",
+      "https://civic-issue-reporting-rqx6.vercel.app/",
     ],
     credentials: true,
   })
