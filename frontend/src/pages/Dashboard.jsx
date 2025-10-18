@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { searchQuery } = useSearch(); // 🌐 global search query
+  const { searchQuery } = useSearch(); // global search query
 
   // Fetch issues from backend
   const fetchIssues = async () => {
