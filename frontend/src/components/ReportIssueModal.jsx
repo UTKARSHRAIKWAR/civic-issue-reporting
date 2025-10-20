@@ -214,7 +214,7 @@ const ReportIssueForm = () => {
       setLocationInput("");
       setLocationCoords(null);
       setNotifyByEmail(false);
-      setTimeout(() => navigate("/dashboard"), 2500);
+      setTimeout(() => navigate("/"), 2500);
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to submit report.";
       toast.error(msg);
