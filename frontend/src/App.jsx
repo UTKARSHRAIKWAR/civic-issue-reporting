@@ -13,7 +13,9 @@ function App() {
     <BrowserRouter basename="/">
       <Toaster richColors position="bottom-right" />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        {/* <Route path="/" element={<Dashboard />} /> */}
+        <Route path="/" element={<div>Hello Home!</div>} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
