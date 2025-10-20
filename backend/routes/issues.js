@@ -15,15 +15,14 @@ router.post(
 router.patch(
   // update issue status
   "/:id/status",
-  verifyToken,
-  isAdmin,
   issueController.updateIssueStatus
 );
 
 // GET: All issues
 router.get("/", issueController.getAllIssues);
+router.get("/stats", issueController.getStats);
 router.get("/:id", issueController.getIssueById);
-router.delete("/:id", verifyToken, isAdmin, issueController.deleteIssue);
-router.patch("/:id", verifyToken, issueController.updateIssue);
+router.delete("/:id", issueController.deleteIssue);
+router.patch("/:id", issueController.updateIssue);
 
 module.exports = router;

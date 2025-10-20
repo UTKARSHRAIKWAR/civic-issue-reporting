@@ -180,6 +180,34 @@ const updateIssue = asyncHandler(async (req, res) => {
   });
 });
 
+const getStats = asyncHandler(async (req, res) => {
+  const stats = await Issue.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  // Initialize counts
+  let total = 0,
+    pending = 0,
+    open = 0,
+    inProgress = 0,
+    resolved = 0;
+
+  stats.forEach((item) => {
+    total += item.count; // total of all issues
+    if (item._id === "Pending") pending = item.count;
+    else if (item._id === "Open") open = item.count;
+    else if (item._id === "InProgress") inProgress = item.count;
+    else if (item._id === "Resolved") resolved = item.count;
+  });
+
+  res.status(200).json({ total, pending, open, inProgress, resolved });
+});
+
 module.exports = {
   createIssue,
   getAllIssues,
@@ -187,4 +215,5 @@ module.exports = {
   getIssueById,
   deleteIssue,
   updateIssue,
+  getStats,
 };
