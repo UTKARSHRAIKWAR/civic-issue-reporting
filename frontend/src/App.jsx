@@ -13,12 +13,10 @@ function App() {
     <BrowserRouter basename="/">
       <Toaster richColors position="bottom-right" />
       <Routes>
-        {/* <Route path="/" element={<Dashboard />} /> */}
-        <Route path="/" element={<div>Hello Home!</div>} />
-
+        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/admin-dashboard/issues" element={<IssueDetail />} />
         <Route path="/create" element={<ReportIssueModal />} />
