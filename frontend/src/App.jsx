@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/Admin";
 import ReportIssueModal from "./components/ReportIssueModal";
-import IssueDetail from "./pages/IssueDetails";
+import IssueDetail from "./components/Admin/IssueDetails";
 
 function App() {
   return (
@@ -17,9 +17,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/admin-dashboard/issues" element={<IssueDetail />} />
         <Route path="/create" element={<ReportIssueModal />} />
+        {/* admin routes */}
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard/issues/:id" element={<IssueDetail />} />
       </Routes>
     </BrowserRouter>
   );

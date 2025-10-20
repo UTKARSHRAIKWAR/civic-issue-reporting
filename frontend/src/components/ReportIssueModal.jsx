@@ -275,7 +275,7 @@ const ReportIssueForm = () => {
               type="text"
               value={locationInput}
               onChange={(e) => setLocationInput(e.target.value)}
-              placeholder="Optional: Add landmark or address"
+              placeholder="Add landmark or address"
               className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary mb-2"
             />
             <button
@@ -291,7 +291,7 @@ const ReportIssueForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
-                Upload Photo (Optional)
+                Upload Photo
               </label>
               <div
                 ref={dropRef}
