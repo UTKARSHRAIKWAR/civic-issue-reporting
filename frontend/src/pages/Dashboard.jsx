@@ -130,9 +130,12 @@ import Header from "../components/Header";
 import IssueItem from "../components/IssueItem";
 import { toast } from "sonner";
 import AddIssueButton from "../components/AddIssueButton";
-import Map from "../components/Map";
 import Skeleton from "../components/Skeleton";
 import { useSearch } from "../context/SearchContext";
+import dynamic from "next/dynamic";
+
+// Load Map only on larger screens and client side
+const Map = dynamic(() => import("../components/Map"), { ssr: false });
 
 const Dashboard = () => {
   const [issues, setIssues] = useState([]);
@@ -140,7 +143,6 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const { searchQuery } = useSearch();
 
-  // Detect screen size for mobile safety
   const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
 
   const fetchIssues = async () => {
@@ -220,18 +222,18 @@ const Dashboard = () => {
     <div className="bg-slate-100 dark:bg-slate-900 font-display">
       <div className="relative flex min-h-screen w-full flex-col">
         <Header />
-        <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-screen-xl rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-800 md:p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
-              {/* Left: Issue List */}
+        <main className="flex-1 px-4 py-6 sm:px-5 lg:px-8 lg:py-8">
+          <div className="mx-auto max-w-screen-xl rounded-xl bg-white p-4 shadow-sm dark:bg-slate-800 sm:p-6 md:p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8 gap-y-6">
+              {/* Issue List */}
               <div className="lg:col-span-2">
-                <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
+                <h2 className="mb-4 text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
                   Recent Reports
                 </h2>
                 {renderContent()}
               </div>
 
-              {/* Right: Map (Disabled on Mobile) */}
+              {/* Map for Desktop only */}
               {!isMobile && (
                 <div className="hidden lg:block lg:col-span-1">
                   <h2 className="mb-4 text-xl font-bold text-gray-800 dark:text-white">
