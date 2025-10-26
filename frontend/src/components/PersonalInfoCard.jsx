@@ -112,7 +112,7 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
       <div className="mt-6 grid grid-cols-1 gap-4 @lg:grid-cols-2">
         <label className="flex flex-col min-w-40 flex-1">
           <p className="text-text-label text-sm font-medium leading-normal pb-2">
-            User Name
+            Username
           </p>
           <input
             className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-body bg-gray-100 focus:outline-0 focus:ring-2 focus:ring-secondary/50 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-secondary h-12 placeholder:text-text-label p-3 text-base font-normal leading-normal disabled:opacity-70"
