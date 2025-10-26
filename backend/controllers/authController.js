@@ -86,7 +86,7 @@ exports.login = asyncHandler(async (req, res) => {
     token,
     user: {
       id: user._id,
-      name: user.name,
+      name: user.username,
       email: user.email,
       role: user.role,
       location: user.location,
