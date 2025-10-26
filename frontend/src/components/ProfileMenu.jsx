@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LogIn, User, LogOut, Settings } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const ProfileMenu = ({ user }) => {
