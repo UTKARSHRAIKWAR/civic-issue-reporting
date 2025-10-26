@@ -17,9 +17,9 @@ userSchema.methods.isProfileComplete = function () {
   return this.name && this.email && this.location;
 };
 
-// Static method to find user by Clerk ID
-userSchema.statics.findByClerkId = function (clerkUserId) {
-  return this.findOne({ clerkUserId });
+// Static method to find user by ID
+userSchema.statics.findByClerkId = function (_id) {
+  return this.findOne({ _id });
 };
 
 module.exports = mongoose.model("User", userSchema);
