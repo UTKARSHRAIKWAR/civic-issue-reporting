@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearch } from "../context/SearchContext";
-import ProfileMenu from "./Profile";
+import ProfileMenu from "./ProfileMenu";
 
 const Header = ({ onNotificationsClick }) => {
   const { searchQuery, setSearchQuery } = useSearch();
