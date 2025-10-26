@@ -1,30 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useSearch } from "../context/SearchContext";
+import ProfileMenu from "./Profile";
 
-const Header = ({ onNotificationsClick, onProfileClick }) => {
+const Header = ({ onNotificationsClick }) => {
   const { searchQuery, setSearchQuery } = useSearch();
   const [localQuery, setLocalQuery] = useState(searchQuery);
 
-  // Debounce logic (wait 300ms before updating global search)
+  // Debounce: wait 300ms before syncing to global search
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSearchQuery(localQuery);
     }, 300);
-
     return () => clearTimeout(timeout);
   }, [localQuery, setSearchQuery]);
 
-  const handleSearchChange = (e) => {
-    setLocalQuery(e.target.value);
-  };
+  const handleSearchChange = (e) => setLocalQuery(e.target.value);
 
   const handleNotifications =
     onNotificationsClick || (() => alert("Notifications Clicked!"));
-  const handleProfile = onProfileClick || (() => alert("Profile Clicked!"));
 
   return (
-    <header className="flex w-full items-center justify-between border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-slate-800">
-      {/* Left Logo */}
+    <header className="flex w-full items-center justify-between border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-slate-900/90 backdrop-blur">
+      {/* Left: Logo */}
       <div className="flex items-center gap-2">
         <div className="size-6 text-blue-600">
           <svg
@@ -40,43 +37,42 @@ const Header = ({ onNotificationsClick, onProfileClick }) => {
         </h1>
       </div>
 
-      {/* Search Bar */}
+      {/* Middle: Search Bar */}
       <div className="flex flex-1 justify-end px-6">
         <div className="relative w-full max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-gray-400">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-gray-400 dark:text-gray-400">
             search
           </span>
           <input
             type="text"
             placeholder="Search for issues, locations..."
-            className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 text-sm text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700/50 dark:text-gray-200 dark:placeholder:text-gray-400"
             value={localQuery}
             onChange={handleSearchChange}
+            className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 text-sm text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-200 dark:placeholder:text-gray-400"
           />
         </div>
       </div>
 
-      {/* Right Icons */}
-      <div className="flex items-center gap-3">
+      {/* Right: Notifications + Profile */}
+      <div className="flex items-center gap-4">
+        {/* Notifications Button */}
         <button
           onClick={handleNotifications}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
           aria-label="View notifications"
         >
-          <span className="material-symbols-outlined text-[20px] text-gray-700 dark:text-gray-300">
+          <span className="material-symbols-outlined text-[20px] text-gray-700 dark:text-gray-200">
             notifications
           </span>
         </button>
-        <div
-          onClick={handleProfile}
-          className="h-10 w-10 cursor-pointer rounded-full border border-gray-300 bg-cover bg-center dark:border-gray-700"
-          style={{
-            backgroundImage:
-              'url("https://api.dicebear.com/7.x/adventurer/svg?seed=CivicUser")',
+
+        {/* Profile Menu */}
+        <ProfileMenu
+          user={{
+            name: "Utkarsh Raikwar",
+            avatar: "https://api.dicebear.com/8.x/thumbs/svg?seed=Utkarsh",
           }}
-          aria-label="Open user menu"
-          role="button"
-        ></div>
+        />
       </div>
     </header>
   );
