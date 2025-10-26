@@ -87,7 +87,9 @@ import ProfileMenu from "./ProfileMenu";
 const Header = ({ onNotificationsClick }) => {
   const { searchQuery, setSearchQuery } = useSearch();
   const [localQuery, setLocalQuery] = useState(searchQuery);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  // Debounce: wait 300ms before syncing to global search
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSearchQuery(localQuery);
@@ -105,11 +107,7 @@ const Header = ({ onNotificationsClick }) => {
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
         <div className="size-7 text-blue-600">
-          <svg
-            fill="currentColor"
-            viewBox="0 0 48 48"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg fill="currentColor" viewBox="0 0 48 48">
             <path d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z" />
           </svg>
         </div>
@@ -118,8 +116,8 @@ const Header = ({ onNotificationsClick }) => {
         </h1>
       </div>
 
-      {/* Middle: Search Bar */}
-      <div className="hidden md:flex flex-1 justify-center px-6">
+      {/* Middle: Desktop Search Bar */}
+      <div className="hidden md:flex flex-1 justify-end px-6">
         <div className="relative w-full max-w-xl">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-gray-400 dark:text-gray-400">
             search
@@ -129,26 +127,27 @@ const Header = ({ onNotificationsClick }) => {
             placeholder="Search for issues, locations..."
             value={localQuery}
             onChange={handleSearchChange}
-            className="w-full rounded-xl bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-500 
-            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 transition"
+            className="w-full rounded-xl bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 transition"
           />
         </div>
       </div>
 
-      {/* Right: Notifications + Profile */}
-      <div className="flex items-center gap-4">
-        {/* Mobile search icon */}
-        <button className="md:hidden flex items-center justify-center rounded-full p-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition">
+      {/* Right: Mobile Search Icon + Notifications + Profile */}
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Mobile Search Icon */}
+        <button
+          className="md:hidden flex items-center justify-center rounded-full p-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+          onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+        >
           <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
             search
           </span>
         </button>
 
-        {/* Notifications Button */}
+        {/* Notifications */}
         <button
           onClick={handleNotifications}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200
-          dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
           aria-label="View notifications"
         >
           <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
@@ -163,6 +162,27 @@ const Header = ({ onNotificationsClick }) => {
           }}
         />
       </div>
+
+      {/* Mobile Search Input Overlay */}
+      {mobileSearchOpen && (
+        <div className="absolute inset-0 bg-white dark:bg-slate-900 px-4 pt-3 pb-2 z-20 flex items-center gap-3 md:hidden">
+          <input
+            type="text"
+            placeholder="Search for issues, locations..."
+            value={localQuery}
+            onChange={handleSearchChange}
+            className="flex-1 rounded-xl bg-gray-100 py-2.5 pl-4 pr-4 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 transition"
+          />
+          <button
+            className="flex items-center justify-center rounded-full p-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+            onClick={() => setMobileSearchOpen(false)}
+          >
+            <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
+              close
+            </span>
+          </button>
+        </div>
+      )}
     </header>
   );
 };
