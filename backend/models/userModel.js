@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: "user" }, // could be 'admin' or 'user'
-    location: { type: String, default: null },
+    city: { type: String, default: null },
     profilePictureUrl: { type: String, default: null },
   },
   { timestamps: true }

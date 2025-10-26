@@ -47,7 +47,7 @@ exports.signup = asyncHandler(async (req, res) => {
     email,
     password: hashedPassword,
     role,
-    // location,
+    city,
   });
 
   return res.status(201).json({ message: "User registered successfully" });
@@ -89,7 +89,7 @@ exports.login = asyncHandler(async (req, res) => {
       name: user.username,
       email: user.email,
       role: user.role,
-      location: user.location,
+      city: user.city,
       profilePictureUrl: user.profilePictureUrl,
     },
     message: "Login successful",
