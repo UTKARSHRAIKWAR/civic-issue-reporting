@@ -6,14 +6,18 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isSavingInfo, setIsSavingInfo] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name || "",
+    // Changed 'name' to 'username'
+    username: user.username || "",
     email: user.email || "",
     city: user.city || "",
   });
 
+  // console.log(user);
+
   useEffect(() => {
     setFormData({
-      name: user.name || "",
+      // Changed 'name' to 'username'
+      username: user.username || "",
       email: user.email || "",
       city: user.city || "",
     });
@@ -31,7 +35,8 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
   const handleCancelEdit = () => {
     setIsEditingInfo(false);
     setFormData({
-      name: user.name || "",
+      // Changed 'name' to 'username'
+      username: user.username || "",
       email: user.email || "",
       city: user.city || "",
     });
@@ -41,7 +46,8 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
     setIsSavingInfo(true);
     try {
       const response = await api.put(`/api/profile/${userId}`, {
-        name: formData.name,
+        // Changed 'name' to 'username'
+        username: formData.username,
         email: formData.email,
         city: formData.city,
       });
@@ -75,7 +81,8 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
               Personal Information
             </p>
             <p className="text-text-label text-base font-normal leading-normal">
-              Update your name, email, and city.
+              {/* Updated description */}
+              Update your username, email, and city.
             </p>
           </div>
 
@@ -118,9 +125,11 @@ const PersonalInfoCard = ({ userId, user, onInfoUpdate }) => {
             className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-body bg-gray-100 focus:outline-0 focus:ring-2 focus:ring-secondary/50 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-secondary h-12 placeholder:text-text-label p-3 text-base font-normal leading-normal disabled:opacity-70"
             readOnly={!isEditingInfo}
             disabled={!isEditingInfo}
-            value={formData.name}
+            // Changed value
+            value={formData.username}
             onChange={handleInfoChange}
-            name="name"
+            // Changed name
+            name="username"
           />
         </label>
         <label className="flex flex-col min-w-40 flex-1">

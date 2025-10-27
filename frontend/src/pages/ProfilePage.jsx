@@ -1,18 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // 1. Import useEffect
 import { toast } from "sonner";
 import PersonalInfoCard from "../components/PersonalInfoCard";
 import SecurityCard from "../components/SecurityCard";
 import ProfilePictureCard from "../components/ProfilePictureCard";
 import ImpactCard from "../components/ImpactCard";
+import api from "../axios";
 
 const DEFAULT_AVATAR = "https://via.placeholder.com/96";
 
 const ProfilePage = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-
   const [currentUser, setCurrentUser] = useState(userInfo?.user || {});
   const _id = currentUser?.id;
 
+  // 2. Fetch data inside a useEffect hook
+  useEffect(() => {
+    // Define an async function to fetch data
+    const fetchUserData = async () => {
+      if (!_id) {
+        // Don't fetch if ID isn't available yet
+        return;
+      }
+
+      try {
+        // 3. Use "await" to get the response
+        const response = await api.get(`/api/profile/${_id}`);
+
+        // 4. Set the state with the fresh data from the server
+        const freshUserData = response.data;
+        setCurrentUser(freshUserData);
+
+        // 5. Also update localStorage to keep it in sync
+        const updatedUserInfo = { ...userInfo, user: freshUserData };
+        localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
+      } catch (error) {
+        console.error("Could not get user data:", error);
+        toast.error("Could not fetch latest profile data.");
+      }
+    };
+
+    fetchUserData(); // Call the fetch function
+  }, [_id]); // This hook runs when the component mounts or if _id changes
+
+
+  // This function updates state AND localStorage
   const updateUserData = (updatedUserFields) => {
     const updatedUser = { ...currentUser, ...updatedUserFields };
     const updatedUserInfo = { ...userInfo, user: updatedUser };
@@ -53,7 +84,8 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <ImpactCard issuesReported={currentUser?.issuesReported || 28} />
+        {/* 6. This fix was correct (matches your schema) */}
+        <ImpactCard issuesReported={currentUser?.issueReported || 0} />
 
         <ProfilePictureCard
           userId={_id}
