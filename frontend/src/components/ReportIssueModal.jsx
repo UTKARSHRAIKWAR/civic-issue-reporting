@@ -2,16 +2,16 @@ import {
   SpinnerIcon,
   CloseIcon,
   CheckCircleIcon,
-} from "../components/ui/Icons"; // icons
+} from "../components/ui/Icons";
 import React, { useState, useEffect, useRef } from "react";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import UploadSection from "./UploadSection"; // ✅ import our new component
+import UploadSection from "./UploadSection"; // ✅ Modern upload section
 
-// Leaflet marker fix
+// Fix leaflet marker icons
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -22,7 +22,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-// --- Issue Types ---
+// Issue categories
 const issueTypes = [
   "Road Damage",
   "Streetlight Issue",
@@ -40,7 +40,6 @@ const ReportIssueForm = () => {
   const [selectedIssue, setSelectedIssue] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
   const [notifyByEmail, setNotifyByEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reportSubmitted, setReportSubmitted] = useState(false);
@@ -55,15 +54,7 @@ const ReportIssueForm = () => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
-  // --- Preview effect ---
-  useEffect(() => {
-    if (!file) return setPreviewUrl(null);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  // --- Map Initialization ---
+  // Initialize Map
   useEffect(() => {
     if (mapRef.current) return;
 
@@ -73,65 +64,87 @@ const ReportIssueForm = () => {
     mapRef.current = L.map(mapContainer).setView([22.7196, 75.8577], 13);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap",
+      attribution: "© OpenStreetMap contributors",
     }).addTo(mapRef.current);
 
     setTimeout(() => mapRef.current.invalidateSize(), 100);
 
     navigator.geolocation?.getCurrentPosition(
       ({ coords }) => {
-        setLocationCoords({ lat: coords.latitude, lng: coords.longitude });
-        mapRef.current.setView([coords.latitude, coords.longitude], 15);
+        const { latitude, longitude } = coords;
+        setLocationCoords({ lat: latitude, lng: longitude });
+        mapRef.current.setView([latitude, longitude], 15);
+        markerRef.current = L.marker([latitude, longitude]).addTo(
+          mapRef.current
+        );
       },
-      () =>
-        toast.info("Could not fetch current location. Please select manually.")
+      () => toast.info("Could not fetch your location. Select manually.")
     );
 
-    mapRef.current.on("click", (e) =>
-      setLocationCoords({ lat: e.latlng.lat, lng: e.latlng.lng })
-    );
+    mapRef.current.on("click", (e) => {
+      setLocationCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
+    });
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
   }, []);
 
-  // --- Marker management ---
+  // Update marker when location changes
   useEffect(() => {
-    if (!locationCoords || !mapRef.current) return;
+    if (!mapRef.current || !locationCoords) return;
+
     const { lat, lng } = locationCoords;
-    if (markerRef.current) markerRef.current.setLatLng([lat, lng]);
-    else markerRef.current = L.marker([lat, lng]).addTo(mapRef.current);
+
+    if (!markerRef.current) {
+      markerRef.current = L.marker([lat, lng]).addTo(mapRef.current);
+    } else {
+      markerRef.current.setLatLng([lat, lng]);
+    }
   }, [locationCoords]);
 
-  // --- Locate Me ---
+  // Smooth Locate Me
   const handleLocateMe = () => {
     if (!navigator.geolocation)
-      return toast.error("Geolocation not supported.");
+      return toast.error("Geolocation not supported by this browser.");
+
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        setLocationCoords({ lat: coords.latitude, lng: coords.longitude });
-        mapRef.current.setView([coords.latitude, coords.longitude], 15);
+        const { latitude, longitude } = coords;
+        setLocationCoords({ lat: latitude, lng: longitude });
+
+        // Smooth pan animation
+        mapRef.current.flyTo([latitude, longitude], 15, {
+          animate: true,
+          duration: 1.5,
+        });
+
+        // Smooth marker update
+        if (markerRef.current) {
+          markerRef.current.setLatLng([latitude, longitude]);
+        } else {
+          markerRef.current = L.marker([latitude, longitude]).addTo(
+            mapRef.current
+          );
+        }
+        toast.success("Location updated!");
       },
-      () => toast.error("Could not fetch your location.")
+      () => toast.error("Unable to fetch your location.")
     );
   };
 
-  // --- Submit ---
+  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!token) return toast.error("You must be logged in.");
-    if (!title.trim()) return toast.error("Please provide a title.");
+    if (!token) return toast.error("Please log in to report an issue.");
+    if (!title.trim()) return toast.error("Please enter a title.");
     if (!selectedIssue) return toast.error("Please select a category.");
-    if (!description.trim())
-      return toast.error("Please provide a description.");
+    if (!description.trim()) return toast.error("Please add a description.");
     if (!locationCoords)
       return toast.error("Please select a location on the map.");
 
-    const locationField = {
+    const locationData = {
       name: locationInput || "Not provided",
       latitude: locationCoords.lat,
       longitude: locationCoords.lng,
@@ -141,9 +154,9 @@ const ReportIssueForm = () => {
     formData.append("title", title.trim());
     formData.append("category", selectedIssue);
     formData.append("description", description.trim());
-    formData.append("location", JSON.stringify(locationField));
-    if (email) formData.append("email", email);
+    formData.append("location", JSON.stringify(locationData));
     formData.append("notifyByEmail", notifyByEmail);
+    if (email) formData.append("email", email);
     if (file) formData.append("file", file);
 
     setLoading(true);
@@ -152,18 +165,10 @@ const ReportIssueForm = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setReportSubmitted(true);
-      toast.success("Report submitted successfully!");
-      setTitle("");
-      setSelectedIssue("");
-      setDescription("");
-      setFile(null);
-      setLocationInput("");
-      setLocationCoords(null);
-      setNotifyByEmail(false);
-      setTimeout(() => navigate("/"), 2500);
+      toast.success("Issue reported successfully!");
+      setTimeout(() => navigate("/dashboard"), 2000);
     } catch (err) {
-      const msg = err.response?.data?.message || "Failed to submit report.";
-      toast.error(msg);
+      toast.error(err.response?.data?.message || "Failed to submit report.");
     } finally {
       setLoading(false);
     }
@@ -176,9 +181,9 @@ const ReportIssueForm = () => {
         className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg w-full max-w-4xl max-h-[95vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10 flex justify-between items-center border-b border-slate-200 dark:border-slate-700 p-4 md:p-6">
+        <div className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-10 flex justify-between items-center border-b border-slate-200 dark:border-slate-700 p-4 md:p-6">
           <h2 className="text-xl md:text-2xl font-semibold">
-            Report a New Issue
+            Report a Civic Issue
           </h2>
           <button
             type="button"
@@ -197,14 +202,14 @@ const ReportIssueForm = () => {
             </label>
             <input
               type="text"
+              placeholder="e.g., Pothole on main road"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Large pothole on MG Road"
-              className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-primary"
             />
           </div>
 
-          {/* Location */}
+          {/* Location Section */}
           <div>
             <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
               Location
@@ -213,25 +218,26 @@ const ReportIssueForm = () => {
               id="map"
               className="h-64 w-full rounded-lg mb-3 border border-slate-300 dark:border-slate-700"
             />
-            <input
-              type="text"
-              value={locationInput}
-              onChange={(e) => setLocationInput(e.target.value)}
-              placeholder="Add landmark or address"
-              className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary mb-2"
-            />
-            <button
-              type="button"
-              onClick={handleLocateMe}
-              className="px-4 py-2 bg-primary text-white rounded-lg"
-            >
-              Locate Me
-            </button>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                placeholder="Add address or landmark"
+                className="flex-1 p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={handleLocateMe}
+                className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
+              >
+                Locate Me
+              </button>
+            </div>
           </div>
 
-          {/* Upload Section + Description */}
+          {/* Upload + Description */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* ✅ Modern Upload Section */}
             <div>
               <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
                 Upload Photo
@@ -239,24 +245,17 @@ const ReportIssueForm = () => {
               <UploadSection onFileSelect={setFile} />
             </div>
 
-            {/* Description */}
             <div className="flex flex-col space-y-4">
               <div>
-                <label
-                  htmlFor="category"
-                  className="block mb-2 font-medium text-slate-700 dark:text-slate-300"
-                >
+                <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
                   Category
                 </label>
                 <select
-                  id="category"
-                  className="w-full h-12 p-2.5 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                   value={selectedIssue}
                   onChange={(e) => setSelectedIssue(e.target.value)}
+                  className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-primary"
                 >
-                  <option value="" disabled>
-                    Select a category...
-                  </option>
+                  <option value="">Select a category...</option>
                   {issueTypes.map((type) => (
                     <option key={type} value={type}>
                       {type}
@@ -264,52 +263,44 @@ const ReportIssueForm = () => {
                   ))}
                 </select>
               </div>
+
               <div>
-                <label
-                  htmlFor="description"
-                  className="block mb-2 font-medium text-slate-700 dark:text-slate-300"
-                >
+                <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
                   Description
                 </label>
                 <textarea
-                  id="description"
                   rows={5}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide details about the issue..."
-                  className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Describe the issue clearly..."
+                  className="w-full p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
           </div>
 
-          {/* Success Message */}
+          {/* Success */}
           {reportSubmitted && (
             <div className="flex items-center p-4 text-green-800 bg-green-100 dark:bg-green-900/50 dark:text-green-300 rounded-lg">
               <CheckCircleIcon />
-              <span className="font-medium">
-                Report submitted! Redirecting to dashboard...
+              <span className="font-medium ml-2">
+                Report submitted! Redirecting...
               </span>
             </div>
           )}
 
           {/* Footer */}
-          <div className="sticky bottom-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md pt-4 pb-4 md:pb-6 px-4 md:px-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-200 dark:border-slate-700">
-            <div className="flex items-center">
+          <div className="sticky bottom-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 pt-4 pb-4 md:pb-6 px-4 md:px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <label className="flex items-center text-slate-600 dark:text-slate-300">
               <input
-                id="notify"
                 type="checkbox"
                 checked={notifyByEmail}
                 onChange={(e) => setNotifyByEmail(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary"
               />
-              <label
-                htmlFor="notify"
-                className="ml-2 text-sm cursor-pointer text-slate-600 dark:text-slate-300"
-              >
-                Notify me by email
-              </label>
-            </div>
+              <span className="ml-2 text-sm">Notify me by email</span>
+            </label>
+
             <button
               type="submit"
               disabled={loading || reportSubmitted}
