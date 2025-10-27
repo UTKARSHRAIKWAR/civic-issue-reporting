@@ -1,22 +1,20 @@
 import {
   SpinnerIcon,
   CloseIcon,
-  UploadCloudIcon,
   CheckCircleIcon,
 } from "../components/ui/Icons"; // icons
-
 import React, { useState, useEffect, useRef } from "react";
 import api from "../axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import UploadSection from "./UploadSection"; // ✅ import our new component
 
-// Leaflet marker fix for Vite/modern bundlers
+// Leaflet marker fix
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -28,43 +26,16 @@ L.Icon.Default.mergeOptions({
 const issueTypes = [
   "Road Damage",
   "Streetlight Issue",
-  "Footpath / Sidewalk Damage",
-  "Open Manhole",
-  "Traffic Signal Problem",
   "Garbage Not Collected",
-  "Overflowing Dustbin",
-  "Illegal Waste Dumping",
   "Drainage / Sewage Issue",
-  "Stagnant Water / Foul Smell",
-  "Water Leakage / Pipe Burst",
-  "No Water Supply",
-  "Contaminated Water",
   "Power Outage",
-  "Exposed Wires",
-  "Tree Fallen / Blocking Road",
-  "Park Maintenance Issue",
-  "Illegal Tree Cutting",
   "Air / Water Pollution",
-  "Noise Pollution",
-  "Broken Public Property",
-  "Damaged Bus Stop / Shelter",
-  "Missing or Broken Signboard",
   "Illegal Parking",
-  "Encroachment",
-  "Vandalism / Graffiti",
   "Public Nuisance / Safety Concern",
-  "Stray Animal Issue",
-  "Poor Municipal Response",
-  "Corruption / Misconduct",
-  "Grievance Not Resolved",
-  "Accessibility Issue",
-  "Event / Crowd Disturbance",
-  "Community Facility Issue",
   "Others",
 ];
 
 const ReportIssueForm = () => {
-  // --- States & Refs ---
   const [title, setTitle] = useState("");
   const [selectedIssue, setSelectedIssue] = useState("");
   const [description, setDescription] = useState("");
@@ -81,11 +52,10 @@ const ReportIssueForm = () => {
   const token = userInfo?.token;
   const email = userInfo?.user?.email;
 
-  const dropRef = useRef();
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
-  // --- File Preview ---
+  // --- Preview effect ---
   useEffect(() => {
     if (!file) return setPreviewUrl(null);
     const url = URL.createObjectURL(file);
@@ -129,37 +99,13 @@ const ReportIssueForm = () => {
     };
   }, []);
 
-  // --- Marker Management ---
+  // --- Marker management ---
   useEffect(() => {
     if (!locationCoords || !mapRef.current) return;
     const { lat, lng } = locationCoords;
     if (markerRef.current) markerRef.current.setLatLng([lat, lng]);
     else markerRef.current = L.marker([lat, lng]).addTo(mapRef.current);
   }, [locationCoords]);
-
-  // --- Drag & Drop ---
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    dropRef.current.classList.add("border-primary", "bg-primary/10");
-  };
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    dropRef.current.classList.remove("border-primary", "bg-primary/10");
-  };
-  const handleFileSelect = (f) => {
-    if (!f) return;
-    if (!f.type.startsWith("image/"))
-      return toast.error("Only image files allowed.");
-    if (f.size > 5 * 1024 * 1024) return toast.error("File size max 5MB.");
-    setFile(f);
-  };
-  const handleDrop = (e) => {
-    e.preventDefault();
-    dropRef.current.classList.remove("border-primary", "bg-primary/10");
-    handleFileSelect(e.dataTransfer.files[0]);
-  };
-  const handleFileChange = (e) => handleFileSelect(e.target.files?.[0]);
-  const handleRemoveFile = () => setFile(null);
 
   // --- Locate Me ---
   const handleLocateMe = () => {
@@ -174,7 +120,7 @@ const ReportIssueForm = () => {
     );
   };
 
-  // --- Submit Handler ---
+  // --- Submit ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!token) return toast.error("You must be logged in.");
@@ -246,14 +192,10 @@ const ReportIssueForm = () => {
         <div className="p-4 md:p-6 space-y-6">
           {/* Title */}
           <div>
-            <label
-              htmlFor="title"
-              className="block mb-2 font-medium text-slate-700 dark:text-slate-300"
-            >
+            <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
               Title
             </label>
             <input
-              id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -287,54 +229,17 @@ const ReportIssueForm = () => {
             </button>
           </div>
 
-          {/* Photo & Description */}
+          {/* Upload Section + Description */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* ✅ Modern Upload Section */}
             <div>
               <label className="block mb-2 font-medium text-slate-700 dark:text-slate-300">
                 Upload Photo
               </label>
-              <div
-                ref={dropRef}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className="relative border-2 border-dashed rounded-lg h-60 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 transition-colors border-slate-300 dark:border-slate-600"
-              >
-                {previewUrl ? (
-                  <>
-                    <img
-                      src={previewUrl}
-                      alt="Issue preview"
-                      className="w-full h-full object-contain rounded-md p-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveFile}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-lg hover:bg-red-600 transition-colors"
-                    >
-                      <CloseIcon />
-                    </button>
-                  </>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-center p-4">
-                    <UploadCloudIcon />
-                    <span className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                      <span className="font-semibold text-primary">
-                        Click to upload
-                      </span>{" "}
-                      or drag and drop
-                    </span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      accept="image/*"
-                    />
-                  </label>
-                )}
-              </div>
+              <UploadSection onFileSelect={setFile} />
             </div>
 
+            {/* Description */}
             <div className="flex flex-col space-y-4">
               <div>
                 <label
