@@ -8,17 +8,18 @@ const userSchema = new mongoose.Schema(
     role: { type: String, default: "user" }, // could be 'admin' or 'user'
     city: { type: String, default: null },
     profilePictureUrl: { type: String, default: null },
+    issueReported: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
 // Method to check if profile is complete
 userSchema.methods.isProfileComplete = function () {
-  return this.name && this.email && this.location;
+  return this.username && this.email && this.city;
 };
 
 // Static method to find user by ID
-userSchema.statics.findByClerkId = function (_id) {
+userSchema.statics.getUserById = function (_id) {
   return this.findOne({ _id });
 };
 

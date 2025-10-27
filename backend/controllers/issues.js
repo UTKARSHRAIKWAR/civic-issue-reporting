@@ -3,8 +3,16 @@ const sendEmail = require("../utils/sendEmail");
 const { asyncHandler } = require("../utils/asyncHandler");
 const { uploadOnCloudinary } = require("../utils/cloudinary.js");
 const mongoose = require("mongoose");
+const User = require("../models/userModel.js");
 
 const createIssue = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    return res.status(401).json({
+      error: "User not authenticated. Please log in to report an issue.",
+    });
+  }
   const {
     title,
     category,
@@ -54,7 +62,21 @@ const createIssue = asyncHandler(async (req, res) => {
     email,
     notifyByEmail: notifyByEmail === "true",
     fileUrl,
+    reportedBy: userId,
   });
+
+  if (issue) {
+    try {
+      await User.findByIdAndUpdate(userId, {
+        $inc: { issueReported: 1 }, // Atomically increment the count by 1
+      });
+    } catch (userUpdateError) {
+      console.error(
+        `Failed to update issue count for user ${userId}:`,
+        userUpdateError
+      );
+    }
+  }
 
   return res
     .status(201)

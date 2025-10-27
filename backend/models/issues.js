@@ -25,6 +25,7 @@ const issueSchema = new mongoose.Schema({
     type: Boolean,
     default: false, // Default to false if not specified
   },
+  reportedBy: { type: String },
 });
 
 module.exports = mongoose.model("Issue", issueSchema);
