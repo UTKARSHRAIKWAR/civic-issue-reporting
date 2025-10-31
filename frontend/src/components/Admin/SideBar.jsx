@@ -2,7 +2,8 @@ import React, { useState } from "react";
 
 // ✅ Reusable NavLink
 const NavLink = ({ href, icon, text, isActive = false }) => {
-  const baseClasses = "flex items-center gap-3 px-3 py-2 rounded-lg";
+  const baseClasses =
+    "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200";
   const activeClasses =
     "bg-primary/10 dark:bg-primary/20 text-primary dark:text-white";
   const inactiveClasses =
@@ -28,9 +29,11 @@ const SideBar = () => {
       {/* 🔹 Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-primary text-white p-2 rounded-lg shadow-md focus:outline-none"
+        className={`md:hidden fixed top-4 left-4 z-50 bg-primary text-white p-2.5 rounded-lg shadow-md focus:outline-none transition-transform duration-200 ${
+          isOpen ? "rotate-90" : "rotate-0"
+        }`}
       >
-        <span className="material-symbols-outlined">
+        <span className="material-symbols-outlined text-[26px] leading-none">
           {isOpen ? "close" : "menu"}
         </span>
       </button>
@@ -40,7 +43,7 @@ const SideBar = () => {
         className={`fixed md:static top-0 left-0 h-full md:h-auto w-64 bg-white dark:bg-background-dark border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out z-40
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
-        <div className="p-4 flex flex-col w-full">
+        <div className="p-4 flex flex-col w-full h-full">
           {/* Header */}
           <div className="flex gap-3 items-center mb-6">
             <div className="bg-primary rounded-full size-10 flex items-center justify-center">
@@ -59,7 +62,7 @@ const SideBar = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col gap-2 flex-1">
             <NavLink href="/dashboard" icon="dashboard" text="Dashboard" />
             <NavLink href="/admin-dashboard" icon="list" text="Issues" />
             <NavLink href="/users" icon="group" text="Users" />
