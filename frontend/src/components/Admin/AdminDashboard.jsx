@@ -190,7 +190,7 @@ function AdminDashboard() {
       </div>
 
       {/* Reports Table Section */}
-      <div className="bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-6">
+      <div className="bg-white dark:bg-slate-900/70 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-800/60 p-4 sm:p-6">
         <ReportsTable />
       </div>
     </div>
