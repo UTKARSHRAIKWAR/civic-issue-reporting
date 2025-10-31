@@ -38,11 +38,6 @@ const ProfileMenu = ({ user }) => {
           icon: <User size={18} />,
           action: () => navigate("/profile"),
         },
-        {
-          label: "Settings",
-          icon: <Settings size={18} />,
-          action: () => navigate("/settings"),
-        },
       ]
     : [
         {
