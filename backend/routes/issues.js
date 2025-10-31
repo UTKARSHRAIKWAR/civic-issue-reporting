@@ -7,7 +7,7 @@ const { upload } = require("../middlewares/multer.middleware");
 router.post(
   // post issue
   "/",
-  verifyToken, 
+  verifyToken, // verifyToken,
   upload.single("file"),
   issueController.createIssue
 );
