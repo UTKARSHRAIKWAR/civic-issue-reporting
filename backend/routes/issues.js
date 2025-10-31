@@ -12,17 +12,20 @@ router.post(
   issueController.createIssue
 );
 
-router.patch(
-  // update issue status
-  "/:id/status",
-  issueController.updateIssueStatus
-);
-
 // GET: All issues
 router.get("/", issueController.getAllIssues);
-router.get("/stats", issueController.getStats);
-router.get("/:id", issueController.getIssueById);
-router.delete("/:id", issueController.deleteIssue);
+
+//admin routes
+router.get("/stats", verifyToken, isAdmin, issueController.getStats);
+router.get("/:id", verifyToken, isAdmin, issueController.getIssueById);
+router.delete("/:id", verifyToken, isAdmin, issueController.deleteIssue);
+router.patch(
+  "/:id/status",
+  verifyToken,
+  isAdmin,
+  issueController.updateIssueStatus //update issue status
+);
+//later update
 router.patch("/:id", issueController.updateIssue);
 
 module.exports = router;
