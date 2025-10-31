@@ -8,6 +8,8 @@ import ReportIssueModal from "./components/ReportIssueModal";
 import IssueDetail from "./components/Admin/IssueDetails";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
+import Users from "./components/Admin/Users";
+import Analytics from "./components/Admin/Analytics";
 
 function App() {
   return (
@@ -52,6 +54,22 @@ function App() {
           element={
             <ProtectedRoute role="admin">
               <IssueDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute role="admin">
+              <Users />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute role="admin">
+              <Analytics />
             </ProtectedRoute>
           }
         />

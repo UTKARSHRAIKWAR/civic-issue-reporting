@@ -47,7 +47,7 @@ const SideBar = () => {
           <NavLink href="/dashboard" icon="dashboard" text="Dashboard" />
           <NavLink href="/admin-dashboard" icon="list" text="Issues" />
           <NavLink href="/users" icon="group" text="Users" />
-          <NavLink href="/settings" icon="settings" text="Settings" />
+          <NavLink href="/analytics" icon="settings" text="Analytics" />
         </nav>
       </div>
     </aside>
