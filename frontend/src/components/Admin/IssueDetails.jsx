@@ -19,20 +19,42 @@
 //   useEffect(() => {
 //     const fetchIssue = async () => {
 //       try {
+//         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+//         const token = userInfo?.token;
+//         const role = userInfo?.user?.role;
+
+//         if (!token) {
+//           toast.error("Unauthorized: Please log in");
+//           navigate("/login");
+//           return;
+//         }
+
+//         if (role !== "admin") {
+//           toast.error("Access denied: Admins only");
+//           navigate("/");
+//           return;
+//         }
+
 //         setLoading(true);
-//         const { data } = await api.get(`/api/issues/${id}/`);
+//         const { data } = await api.get(`/api/issues/${id}`, {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
 //         setIssue(data);
 //       } catch (err) {
 //         console.error(err);
 //         setError("Failed to fetch issue details.");
-//         toast.error("Failed to fetch issue details.");
+//         toast.error(
+//           err.response?.data?.message || "Failed to fetch issue details."
+//         );
 //       } finally {
 //         setLoading(false);
 //       }
 //     };
 
 //     fetchIssue();
-//   }, [id]);
+//   }, [id, navigate]);
 
 //   if (loading)
 //     return (
@@ -53,38 +75,63 @@
 //     ? [issue.fileUrl]
 //     : [];
 
-//   // 🟢 Handle status change
+//   // 🟢 Handle status change (Admin Only)
 //   const handleStatusChange = async (e) => {
 //     const newStatus = e.target.value;
-//     setStatusLoading(true);
+//     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+//     const token = userInfo?.token;
 
+//     if (!token) {
+//       toast.error("Unauthorized: Please log in");
+//       return;
+//     }
+
+//     setStatusLoading(true);
 //     try {
-//       await api.patch(`/api/issues/${id}/status`, { newStatus });
+//       await api.patch(
+//         `/api/issues/${id}/status`,
+//         { newStatus },
+//         {
+//           headers: { Authorization: `Bearer ${token}` },
+//         }
+//       );
 //       setIssue((prev) => ({ ...prev, status: newStatus }));
 //       toast.success(`Status changed to "${newStatus}".`);
-
-//       // Prevent rapid toggles by keeping it disabled briefly
-//       setTimeout(() => {
-//         setStatusLoading(false);
-//       }, 1000);
 //     } catch (err) {
 //       console.error(err);
-//       toast.error("Failed to update status.");
+//       toast.error(err.response?.data?.message || "Failed to update status.");
+//     } finally {
 //       setStatusLoading(false);
 //     }
 //   };
 
-//   // 🔴 Handle delete issue
+//   // 🔴 Handle delete issue (Admin Only)
 //   const handleClose = async () => {
+//     const confirmDelete = window.confirm(
+//       "Are you sure you want to delete this issue?"
+//     );
+//     if (!confirmDelete) return;
+
 //     setDeleteLoading(true);
+//     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+//     const token = userInfo?.token;
+
+//     if (!token) {
+//       toast.error("Unauthorized: Please log in");
+//       setDeleteLoading(false);
+//       return;
+//     }
+
 //     try {
-//       await api.delete(`/api/issues/${id}`);
+//       await api.delete(`/api/issues/${id}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
 //       toast.success("Issue deleted successfully.");
 //       navigate("/admin-dashboard");
 //     } catch (err) {
 //       console.error(err);
 //       setError("Failed to delete issue.");
-//       toast.error("Failed to delete issue.");
+//       toast.error(err.response?.data?.message || "Failed to delete issue.");
 //     } finally {
 //       setDeleteLoading(false);
 //     }
@@ -110,7 +157,7 @@
 //                 </p>
 //               </div>
 
-//               {/* 🟡 Status Dropdown with Spinner */}
+//               {/* 🟡 Status Dropdown */}
 //               <div className="flex flex-col gap-1">
 //                 <label className="text-sm text-gray-500 dark:text-gray-400 font-medium">
 //                   Status
@@ -375,6 +422,19 @@ const IssueDetail = () => {
       <SideBar />
 
       <main className="flex-1 p-8">
+        {/* 🟢 Mobile Back Button */}
+        <div className="block md:hidden mb-4">
+          <button
+            onClick={() => navigate("/admin-dashboard")}
+            className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200"
+          >
+            <span className="material-symbols-outlined text-base">
+              arrow_back
+            </span>
+            Back
+          </button>
+        </div>
+
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
