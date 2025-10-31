@@ -21,27 +21,29 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await api.post("/api/auth/login", { email, password });
-      toast.success("Login successful! Redirecting...");
+
+      // store user data
       localStorage.setItem("userInfo", JSON.stringify(data));
+      toast.success(`Welcome back, ${data?.user?.name || "User"}!`);
+      console.log(data);
+
+      // redirect based on role
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+        if (data?.user?.role === "admin") navigate("/admin-dashboard");
+        else navigate("/dashboard");
+      }, 1200);
     } catch (error) {
       toast.error(
-        error.response?.data?.message ??
-          "An unexpected error occurred. Please try again."
+        error.response?.data?.error ||
+          "Invalid credentials or server error. Please try again."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col justify-center items-center font-sans p-4">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col justify-center items-center font-sans p-4 sm:p-6">
       {/* Logo Section */}
       <div className="flex items-center gap-2 mb-8">
         <span
@@ -56,7 +58,7 @@ const Login = () => {
       </div>
 
       {/* Login Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-8 w-full max-w-md">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8 w-full max-w-md transition-all duration-300">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Log In
@@ -108,19 +110,18 @@ const Login = () => {
               />
               <button
                 type="button"
-                onClick={togglePasswordVisibility}
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 <span className="material-symbols-outlined">
-                  {showPassword ? "hide" : "show"}
+                  {showPassword ? "visibility_off" : "visibility"}
                 </span>
               </button>
             </div>
           </div>
 
           {/* Remember me + Forgot */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -178,7 +179,7 @@ const Login = () => {
         {/* Sign Up */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
+            Don’t have an account?{" "}
             <Link
               to="/register"
               className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
