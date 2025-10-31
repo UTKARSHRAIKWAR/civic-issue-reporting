@@ -1,16 +1,155 @@
-# React + Vite
+# Civic Reporting Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **frontend** of the Civic Reporting App — a web application that allows users to report civic issues, track their status, and interact with authorities.  
+It supports **User** and **Admin** roles with separate dashboards and access control.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tech Stack
 
-## React Compiler
+- **React.js** — Frontend framework
+- **Tailwind CSS** — Styling
+- **Axios** — API communication
+- **React Router DOM** — Routing
+- **Sonner** — Toast notifications
+- **Leaflet.js** — Map integration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🧩 Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 👤 User Features
+
+- Register and login securely
+- Report civic issues with image and location
+- View issue history and status updates
+- Edit profile and update profile picture
+- Responsive design for mobile & desktop
+
+### 🛠️ Admin Features
+
+- Register as **Admin** using organization email (e.g., ends with `@yourdomain.com`)
+- Manage all user-reported issues
+- Update issue status (Pending → Resolved)
+- Manage registered users
+- Access admin dashboard with analytics
+
+---
+
+## 🔑 Admin Registration
+
+Admins can register directly from the **Register Page** if their email domain matches the environment variable:
+
+```
+DOMAIN_NAME=@yourdomain.com
+```
+
+Example:
+
+- `user@gmail.com` → registered as **User**
+- `john@yourdomain.com` → registered as **Admin**
+
+Make sure your backend `.env` includes this line:
+
+```bash
+DOMAIN_NAME=@yourdomain.com
+```
+
+When testing through Postman or frontend:
+
+- If `email` ends with the configured domain, role = **admin**
+- Otherwise, role = **user**
+
+---
+
+## 📦 Project Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/UTKARSHRAIKWAR/civic-issue-reporting.git
+cd civic-issue-reporting/frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Create `.env` file
+
+```bash
+VITE_API_URL=http://localhost:5000/api
+```
+
+### 4. Run the project
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧠 Folder Structure
+
+```
+civic-reporting-frontend/
+│
+├── src/
+│   ├── components/         # Reusable components
+│   ├── pages/              # Page-level components
+│   ├── context/            # Global state (Search, Auth)
+│   ├── axios.js            # Axios instance setup
+│   ├── App.jsx             # Main app entry
+│   └── main.jsx            # ReactDOM entry
+│
+├── public/
+│   └── assets/             # Images, icons, etc.
+│
+└── package.json
+```
+
+---
+
+## 🔒 Authentication
+
+- Uses **JWT tokens** stored in `localStorage`.
+- Role-based access implemented using **ProtectedRoute**.
+
+Example:
+
+```jsx
+<ProtectedRoute role="admin">
+  <AdminDashboard />
+</ProtectedRoute>
+```
+
+---
+
+## 🗺️ Map Integration
+
+- Uses **Leaflet.js** for map rendering and geolocation.
+- “Locate Me” feature fetches user’s live position for issue reporting.
+
+---
+
+## 🧰 Utilities
+
+- **Toast notifications** for success and error feedback.
+- **Axios interceptors** for JWT handling.
+- **Fully responsive Tailwind UI** for mobile & desktop.
+
+---
+
+## 🧑‍💻 Author
+
+**Utkarsh Raikwar**  
+Full Stack Developer — React + Node.js  
+[GitHub](https://github.com/UTKARSHRAIKWAR)
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
