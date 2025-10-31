@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReportsTable from "./ReportsTable";
 import StatsCard from "./StatsCard";
 import api from "../../axios";
+import { toast } from "sonner";
 
 function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -13,18 +14,38 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch stats data when component mounts
+  // ✅ Fetch stats data when component mounts
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await api.get("api/issues/stats/");
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const token = userInfo?.token;
+        const role = userInfo?.user?.role;
+
+        if (!token) {
+          toast.error("Unauthorized: Please log in again");
+          throw new Error("Unauthorized: No token found");
+        }
+
+        if (role !== "admin") {
+          toast.error("Access denied: Admins only");
+          throw new Error("Forbidden: Not an admin");
+        }
+
+        const response = await api.get("/api/issues/stats", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setStats(response.data);
       } catch (err) {
+        console.error("Error fetching admin stats:", err);
         setError(err.message);
+        toast.error(err.response?.data?.message || "Failed to fetch stats");
       } finally {
         setLoading(false);
       }
     };
+
     fetchStats();
   }, []);
 
@@ -49,7 +70,7 @@ function AdminDashboard() {
         {loading ? (
           <p className="text-slate-700 dark:text-slate-300">Loading stats...</p>
         ) : error ? (
-          <p className="text-red-600 dark:text-red-400">Error loading stats.</p>
+          <p className="text-red-600 dark:text-red-400">Error: {error}</p>
         ) : (
           statCards.map((stat) => (
             <StatsCard
