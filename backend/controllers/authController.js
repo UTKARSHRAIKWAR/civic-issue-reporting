@@ -47,7 +47,6 @@ exports.signup = asyncHandler(async (req, res) => {
     email,
     password: hashedPassword,
     role,
-    city,
   });
 
   return res.status(201).json({ message: "User registered successfully" });
