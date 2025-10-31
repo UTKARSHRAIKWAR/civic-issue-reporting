@@ -41,7 +41,12 @@ exports.signup = asyncHandler(async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const role = email.endsWith(process.env.DOMAIN_NAME) ? "admin" : "user";
-  console.log(role);
+
+  console.log(
+    "Domain match?",
+    email.endsWith(process.env.DOMAIN_NAME),
+    process.env.DOMAIN_NAME
+  );
 
   await User.create({
     username,
