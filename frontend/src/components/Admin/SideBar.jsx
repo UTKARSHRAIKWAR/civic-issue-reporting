@@ -44,8 +44,8 @@ const SideBar = () => {
         </div>
         {/* Navigation */}
         <nav className="flex flex-col gap-2">
-          <NavLink href="/admin-dashboard" icon="dashboard" text="Dashboard" />
-          <NavLink href="/admin-dashboard/issues" icon="list" text="Issues" />
+          <NavLink href="/dashboard" icon="dashboard" text="Dashboard" />
+          <NavLink href="/admin-dashboard" icon="list" text="Issues" />
           <NavLink href="/users" icon="group" text="Users" />
           <NavLink href="/settings" icon="settings" text="Settings" />
         </nav>

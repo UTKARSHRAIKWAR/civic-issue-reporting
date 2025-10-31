@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { LogIn, User, LogOut, Settings } from "lucide-react";
+import { LogIn, User, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const ProfileMenu = ({ user }) => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
   const token = userInfo?.token;
+  const role = userInfo?.user?.role;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -29,7 +30,8 @@ const ProfileMenu = ({ user }) => {
     navigate("/login");
   };
 
-  const menuItems = token
+  // Base menu for logged-in users
+  let menuItems = token
     ? [
         {
           label: "Profile",
@@ -41,12 +43,6 @@ const ProfileMenu = ({ user }) => {
           icon: <Settings size={18} />,
           action: () => navigate("/settings"),
         },
-        {
-          label: "Logout",
-          icon: <LogOut size={18} />,
-          action: handleLogout,
-          danger: true,
-        },
       ]
     : [
         {
@@ -56,6 +52,25 @@ const ProfileMenu = ({ user }) => {
           primary: true,
         },
       ];
+
+  // Add Admin Dashboard link only for admins
+  if (role === "admin") {
+    menuItems.unshift({
+      label: "Admin Dashboard",
+      icon: <LayoutDashboard size={18} />,
+      action: () => navigate("/admin-dashboard"),
+    });
+  }
+
+  // Add Logout button for logged-in users
+  if (token) {
+    menuItems.push({
+      label: "Logout",
+      icon: <LogOut size={18} />,
+      action: handleLogout,
+      danger: true,
+    });
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -71,7 +86,9 @@ const ProfileMenu = ({ user }) => {
           alt="profile"
           className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-300 dark:ring-slate-700"
         />
-        <span className="font-medium text-sm">Profile</span>
+        <span className="font-medium text-sm">
+          {user?.username || "Profile"}
+        </span>
       </button>
 
       {/* Dropdown */}
