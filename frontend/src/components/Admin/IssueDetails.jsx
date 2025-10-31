@@ -139,9 +139,20 @@
 
 //   return (
 //     <div className="flex min-h-screen bg-background-light dark:bg-background-dark font-display">
-//       <SideBar />
-
 //       <main className="flex-1 p-8">
+//         {/* 🟢 Mobile Back Button */}
+//         <div className="block md:hidden mb-4">
+//           <button
+//             onClick={() => navigate("/admin-dashboard")}
+//             className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200"
+//           >
+//             <span className="material-symbols-outlined text-base">
+//               arrow_back
+//             </span>
+//             Back
+//           </button>
+//         </div>
+
 //         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 //           {/* Left Column */}
 //           <div className="lg:col-span-2 space-y-6">
@@ -355,7 +366,6 @@ const IssueDetail = () => {
     ? [issue.fileUrl]
     : [];
 
-  // 🟢 Handle status change (Admin Only)
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
@@ -385,7 +395,6 @@ const IssueDetail = () => {
     }
   };
 
-  // 🔴 Handle delete issue (Admin Only)
   const handleClose = async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this issue?"
@@ -419,19 +428,17 @@ const IssueDetail = () => {
 
   return (
     <div className="flex min-h-screen bg-background-light dark:bg-background-dark font-display">
-      <SideBar />
-
-      <main className="flex-1 p-8">
-        {/* 🟢 Mobile Back Button */}
-        <div className="block md:hidden mb-4">
+      <main className="flex-1 p-6 sm:p-8">
+        {/* 🟢 Back Button (Visible on all screens) */}
+        <div className="mb-6">
           <button
             onClick={() => navigate("/admin-dashboard")}
-            className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-lg shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200"
+            className="flex items-center gap-2 text-sm sm:text-base font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-200"
           >
-            <span className="material-symbols-outlined text-base">
+            <span className="material-symbols-outlined text-base sm:text-lg">
               arrow_back
             </span>
-            Back
+            Back to Dashboard
           </button>
         </div>
 
@@ -441,7 +448,7 @@ const IssueDetail = () => {
             {/* Header */}
             <div className="flex flex-wrap justify-between items-start gap-4">
               <div className="flex flex-col gap-2">
-                <p className="text-[#111318] dark:text-white text-4xl font-black tracking-tighter">
+                <p className="text-[#111318] dark:text-white text-3xl sm:text-4xl font-black tracking-tighter">
                   {issue.title}
                 </p>
                 <p className="text-[#637088] dark:text-gray-400 text-base">
