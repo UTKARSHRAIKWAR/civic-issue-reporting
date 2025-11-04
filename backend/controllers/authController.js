@@ -34,6 +34,11 @@ exports.signup = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: result.error.errors[0].message });
   }
 
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    return res.status(409).json({ error: "username already registered" });
+  }
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res.status(409).json({ error: "Email already registered" });

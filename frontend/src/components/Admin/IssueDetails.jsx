@@ -263,7 +263,7 @@ const IssueDetail = () => {
             </div>
 
             <Timeline />
-            <Comments />
+            <Comments issueId={id} />
           </div>
 
           {/* Footer Buttons */}

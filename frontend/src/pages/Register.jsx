@@ -47,7 +47,9 @@ const Register = () => {
       if (error.response) {
         const { status, data } = error.response;
         if (status === 409) {
-          toast.error("This email is already registered. Try logging in.");
+          toast.error(
+            "This email or username is already registered. Try logging in."
+          );
         } else if (status === 400 && data?.error) {
           toast.error(data.error);
         } else {

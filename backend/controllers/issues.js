@@ -238,21 +238,27 @@ const addComment = asyncHandler(async (req, res) => {
 
     const newComment = {
       text,
-      author: req.user?._id || null,
+      author: req.user._id, // ✅ Now available
       createdAt: new Date(),
     };
 
     issue.comments.push(newComment);
     await issue.save();
 
-    // Emit real-time comment update
-    const io = req.app.get("io");
-    io.to(req.params.id).emit("newComment", newComment);
+    const populatedIssue = await Issue.findById(req.params.id).populate(
+      "comments.author",
+      "username email"
+    );
 
-    res.status(201).json(newComment);
+    const latestComment = populatedIssue.comments.slice(-1)[0];
+
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("newComment", latestComment);
+
+    res.status(201).json(latestComment);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Failed to add comment" });
   }
 });
 
