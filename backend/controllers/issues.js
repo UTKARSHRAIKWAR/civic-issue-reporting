@@ -230,6 +230,45 @@ const getStats = asyncHandler(async (req, res) => {
   res.status(200).json({ total, pending, open, inProgress, resolved });
 });
 
+const addComment = asyncHandler(async (req, res) => {
+  try {
+    const { text } = req.body;
+    const issue = await Issue.findById(req.params.id);
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+
+    const newComment = {
+      text,
+      author: req.user?._id || null,
+      createdAt: new Date(),
+    };
+
+    issue.comments.push(newComment);
+    await issue.save();
+
+    // Emit real-time comment update
+    const io = req.app.get("io");
+    io.to(req.params.id).emit("newComment", newComment);
+
+    res.status(201).json(newComment);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+const getComment = asyncHandler(async (req, res) => {
+  try {
+    const issue = await Issue.findById(req.params.id).populate(
+      "comments.author",
+      "username email"
+    );
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+    res.json(issue.comments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = {
   createIssue,
   getAllIssues,
@@ -238,4 +277,6 @@ module.exports = {
   deleteIssue,
   updateIssue,
   getStats,
+  addComment,
+  getComment,
 };

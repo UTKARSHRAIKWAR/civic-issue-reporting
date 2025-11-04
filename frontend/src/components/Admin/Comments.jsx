@@ -1,104 +1,241 @@
-import React from "react";
+// import React, { useEffect, useState } from "react";
+// import { io } from "socket.io-client";
+// import api from "../../axios";
+// import { toast } from "sonner";
 
-export const Timeline = () => {
+// const socket = io(
+//   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+//   {
+//     withCredentials: true,
+//   }
+// );
+
+// const Comments = ({ issueId, userId }) => {
+//   const [comments, setComments] = useState([]);
+//   const [newComment, setNewComment] = useState("");
+
+//   // ✅ Join the issue room and listen for new comments
+//   useEffect(() => {
+//     if (!issueId) return;
+//     socket.emit("joinIssue", issueId);
+
+//     socket.on("newComment", (comment) => {
+//       setComments((prev) => [...prev, comment]);
+//     });
+
+//     return () => {
+//       socket.off("newComment");
+//     };
+//   }, [issueId]);
+
+//   // ✅ Fetch all existing comments when page loads
+//   useEffect(() => {
+//     const fetchComments = async () => {
+//       try {
+//         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+//         const token = userInfo?.token;
+
+//         const { data } = await api.get(`/api/issues/${issueId}/comments`, {
+//           headers: { Authorization: `Bearer ${token}` },
+//         });
+//         setComments(data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+//     fetchComments();
+//   }, [issueId]);
+
+//   // ✅ Add a new comment
+//   const handleAddComment = async () => {
+//     if (!newComment.trim()) {
+//       toast.error("Comment cannot be empty");
+//       return;
+//     }
+
+//     try {
+//       const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+//       const token = userInfo?.token;
+
+//       await api.post(
+//         `/api/issues/${issueId}/comments`,
+//         { text: newComment },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       setNewComment("");
+//       // No need to update state manually — socket will push it
+//     } catch (err) {
+//       toast.error(err.response?.data?.message || "Failed to add comment");
+//     }
+//   };
+
+//   return (
+//     <div className="bg-white dark:bg-background-dark/50 rounded-lg p-6">
+//       <h2 className="text-xl font-semibold text-[#111318] dark:text-white mb-4">
+//         Comments
+//       </h2>
+
+//       <div className="space-y-4 mb-4 max-h-[300px] overflow-y-auto">
+//         {comments.length > 0 ? (
+//           comments.map((comment, idx) => (
+//             <div
+//               key={idx}
+//               className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+//             >
+//               <p className="text-sm text-gray-800 dark:text-gray-300">
+//                 {comment.text}
+//               </p>
+//               <p className="text-xs text-gray-500 mt-1">
+//                 {comment.author?.username || "Anonymous"} •{" "}
+//                 {new Date(comment.createdAt).toLocaleString()}
+//               </p>
+//             </div>
+//           ))
+//         ) : (
+//           <p className="text-gray-500 text-sm">No comments yet.</p>
+//         )}
+//       </div>
+
+//       <div className="flex items-center gap-2">
+//         <input
+//           type="text"
+//           value={newComment}
+//           onChange={(e) => setNewComment(e.target.value)}
+//           placeholder="Add a comment..."
+//           className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+//         />
+//         <button
+//           onClick={handleAddComment}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+//         >
+//           Add
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Comments;
+
+import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import api from "../../axios";
+import { toast } from "sonner";
+
+const socket = io(
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+  {
+    withCredentials: true,
+  }
+);
+
+const Comments = ({ issueId }) => {
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+
+  // ✅ Join the issue room and listen for new comments
+  useEffect(() => {
+    if (!issueId) return;
+    socket.emit("joinIssue", issueId);
+
+    socket.on("newComment", (comment) => {
+      // 🆕 Add new comment at the top instead of bottom
+      setComments((prev) => [comment, ...prev]);
+    });
+
+    return () => {
+      socket.off("newComment");
+    };
+  }, [issueId]);
+
+  // ✅ Fetch all existing comments when page loads
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const token = userInfo?.token;
+
+        const { data } = await api.get(`/api/issues/${issueId}/comments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // 🆕 Sort by newest first
+        const sorted = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setComments(sorted);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchComments();
+  }, [issueId]);
+
+  // ✅ Add a new comment
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      toast.error("Comment cannot be empty");
+      return;
+    }
+
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+      const token = userInfo?.token;
+
+      await api.post(
+        `/api/issues/${issueId}/comments`,
+        { text: newComment },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setNewComment("");
+      // No need to update manually — socket handles it
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to add comment");
+    }
+  };
+
   return (
-    <div>
-      {" "}
-      <div className="bg-white dark:bg-background-dark/50 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-[#111318] dark:text-white mb-4">
-          Timeline
-        </h2>
-        <div className="space-y-6 border-l-2 border-gray-200 dark:border-gray-700 ml-2">
-          <div className="relative pl-8">
-            <div className="absolute -left-[11px] top-1 h-5 w-5 rounded-full bg-primary ring-4 ring-white dark:ring-background-dark/50"></div>
-            <p className="font-medium text-sm text-[#111318] dark:text-white">
-              Issue Submitted
-            </p>
-            <p className="text-xs text-[#637088] dark:text-gray-400">
-              April 23, 2024 - 10:00 AM
-            </p>
-          </div>
-          <div className="relative pl-8">
-            <div className="absolute -left-[11px] top-1 h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600 ring-4 ring-white dark:ring-background-dark/50"></div>
-            <p className="font-medium text-sm text-[#111318] dark:text-white">
-              Assigned to Water Dept.
-            </p>
-            <p className="text-xs text-[#637088] dark:text-gray-400">
-              April 23, 2024 - 11:30 AM
-            </p>
-          </div>
-          <div className="relative pl-8">
-            <div className="absolute -left-[11px] top-1 h-5 w-5 rounded-full bg-gray-300 dark:bg-gray-600 ring-4 ring-white dark:ring-background-dark/50"></div>
-            <p className="font-medium text-sm text-[#111318] dark:text-white">
-              Marked as "In Progress"
-            </p>
-            <p className="text-xs text-[#637088] dark:text-gray-400">
-              April 24, 2024 - 9:00 AM
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-const Comments = () => {
-  return (
-    <div>
-      <div className="bg-white dark:bg-background-dark/50 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-[#111318] dark:text-white mb-4">
-          Comments
-        </h2>
-        <div className="space-y-4">
-          {/* Comment 1 */}
-          <div className="flex gap-3">
-            <img
-              className="size-8 rounded-full"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwJyIF32jxGicOSEtqB2YcJIgKXYcohIHpOwY8XUNmz7bp84V7WRaXkKf5iUFDCd1DjSrfefyt30mHrF52onLurV830eRohFhM1RdMzgVY_Ff0q4RYzxy4ADDZ2Pe4mC0pKbLnx0YGR-TYIdIMGXBcOklGHgB6Q5_4P_Nt24-n4i3sqWaL6UKI6XrzmxerziTBTEy-Wx5ERUyl-wXnfcD3exUrUQjduFtwJ__BGEYhpZsZAblc069ZD1vhL3GGTgmIbYoebcwjkdsF"
-              alt="Admin avatar"
-            />
-            <div>
-              <p className="text-sm font-medium text-[#111318] dark:text-white">
-                Jane Smith
+    <div className="bg-white dark:bg-background-dark/50 rounded-lg p-6">
+      <h2 className="text-xl font-semibold text-[#111318] dark:text-white mb-4">
+        Comments
+      </h2>
+
+      <div className="space-y-4 mb-4 max-h-[300px] overflow-y-auto">
+        {comments.length > 0 ? (
+          comments.map((comment, idx) => (
+            <div
+              key={idx}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+            >
+              <p className="text-sm text-gray-800 dark:text-gray-300">
+                {comment.text}
               </p>
-              <p className="text-sm text-[#637088] dark:text-gray-400">
-                Team has been dispatched to assess the situation.
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                April 24, 2024 - 9:05 AM
+              <p className="text-xs text-gray-500 mt-1">
+                {comment.author?.username || "Anonymous"} •{" "}
+                {new Date(comment.createdAt).toLocaleString()}
               </p>
             </div>
-          </div>
-
-          {/* Comment 2 */}
-          <div className="flex gap-3">
-            <img
-              className="size-8 rounded-full"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC390iN7eGBaBhr6CUjNisfUKnslrPseKd_tut5AgJi-t9qz69rzbh80R7DiqZniBLH7FH3YUy3lUJSk4jbs3cV7xcVGvrWs4yrwZ7qiGx79fac4hcv80JzM0jcAVG-OhyyI5J_3JfOI02sRpC_la9rfc5_sm7CZDkSC5r1yskrZ55sbEcvV2HAo2rP53nNPhk-W9GYIDDG5yiTtWZkuZmJEBm32SHuDU51iyJAb3Ys9oGmTpRySiBNmkmQQhsqYxTWwwE4C5LW87la"
-              alt="Admin avatar"
-            />
-            <div>
-              <p className="text-sm font-medium text-[#111318] dark:text-white">
-                Mike Johnson
-              </p>
-              <p className="text-sm text-[#637088] dark:text-gray-400">
-                Confirmed. Awaiting parts for the repair.
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                April 24, 2024 - 2:30 PM
-              </p>
-            </div>
-          </div>
-        </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm">No comments yet.</p>
+        )}
       </div>
-      {/* Add Comment */}
-      <div className="mt-6">
-        <textarea
-          rows="3"
+
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
-          className="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-[#111318] dark:text-white focus:border-primary focus:ring-primary"
-        ></textarea>
-        <button className="mt-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:bg-primary/90">
-          Add Comment
+          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+        />
+        <button
+          onClick={handleAddComment}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+        >
+          Add
         </button>
       </div>
     </div>

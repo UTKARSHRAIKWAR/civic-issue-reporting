@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../../axios";
 import Map from "../Map";
-import Comments, { Timeline } from "./Comments";
+import Comments from "./Comments";
+import Timeline from "./Timeline";
 
 const IssueDetail = () => {
   const { id } = useParams();

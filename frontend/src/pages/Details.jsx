@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../axios";
 import Map from "../components/Map";
-import Comments, { Timeline } from "../components/Admin/Comments";
+import Comments from "../components/Admin/Comments";
+import Timeline from "../components/Admin/Timeline";
 
 const Details = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const Details = () => {
       try {
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         const token = userInfo?.token;
+        // const userId = userInfo?.user?.id;
 
         if (!token) {
           toast.error("Unauthorized: Please log in");
@@ -164,7 +166,7 @@ const Details = () => {
           {/* RIGHT COLUMN */}
           <div className="space-y-6">
             <Timeline />
-            <Comments />
+            <Comments issueId={id} />
           </div>
         </div>
       </main>

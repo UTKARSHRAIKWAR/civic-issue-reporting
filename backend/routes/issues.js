@@ -29,4 +29,8 @@ router.patch(
 //later update
 router.patch("/:id", issueController.updateIssue);
 
+//comment
+router.post("/:id/comments", verifyToken, issueController.addComment);
+router.get("/:id/comments", verifyToken, issueController.getComment);
+
 module.exports = router;
