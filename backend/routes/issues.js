@@ -32,5 +32,10 @@ router.patch("/:id", issueController.updateIssue);
 //comment
 router.post("/:id/comments", verifyToken, issueController.addComment);
 router.get("/:id/comments", verifyToken, issueController.getComment);
+router.delete(
+  "/:issueId/comments/:commentId",
+  verifyToken,
+  issueController.deleteComment
+);
 
 module.exports = router;

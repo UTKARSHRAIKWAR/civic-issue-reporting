@@ -275,6 +275,44 @@ const getComment = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteComment = asyncHandler(async (req, res) => {
+  try {
+    const { issueId, commentId } = req.params;
+
+    const issue = await Issue.findById(issueId).populate(
+      "comments.author",
+      "username email role"
+    );
+
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+
+    const comment = issue.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // ✅ Check if user is comment author or admin
+    const isOwner =
+      comment.author?._id?.toString() === req.user._id.toString() ||
+      req.user.role === "admin";
+    if (!isOwner)
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this comment" });
+
+    // ✅ Remove comment
+    comment.deleteOne();
+    await issue.save();
+
+    // ✅ Emit event to all clients in the same room
+    const io = req.app.get("io");
+    io.to(issueId).emit("deleteComment", commentId);
+
+    res.json({ message: "Comment deleted successfully", commentId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to delete comment" });
+  }
+});
+
 module.exports = {
   createIssue,
   getAllIssues,
@@ -285,4 +323,5 @@ module.exports = {
   getStats,
   addComment,
   getComment,
+  deleteComment,
 };

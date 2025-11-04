@@ -173,7 +173,7 @@ const io = new Server(server, {
       "http://localhost:5173",
       "https://civic-issue-reporting-phi.vercel.app",
     ],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
   },
 });
