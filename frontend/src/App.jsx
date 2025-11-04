@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import Users from "./components/Admin/Users";
 import Analytics from "./components/Admin/Analytics";
+import Details from "./pages/Details";
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ReportIssueModal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/details/:id"
+          element={
+            <ProtectedRoute>
+              <Details />
             </ProtectedRoute>
           }
         />
