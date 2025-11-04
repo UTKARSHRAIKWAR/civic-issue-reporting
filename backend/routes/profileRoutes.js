@@ -7,7 +7,7 @@ const {
 } = require("../controllers/profileControllers.js");
 const upload = require("../middlewares/upload");
 
-// Get user profile by Clerk ID
+// Get user profile by  ID
 router.get("/:_id", getUserById);
 
 // Update user profile

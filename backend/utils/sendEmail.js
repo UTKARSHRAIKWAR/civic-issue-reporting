@@ -1,8 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendEmail(to, subject, html) {
   await transporter.sendMail({
-    from: `"Civix" <${process.env.EMAIL_ADMIN}>`,
+    from: `"CivicConnect" <${process.env.EMAIL_ADMIN}>`,
     to,
     subject,
     html,

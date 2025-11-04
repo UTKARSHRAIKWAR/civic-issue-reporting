@@ -1,85 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import { useSearch } from "../context/SearchContext";
-// import ProfileMenu from "./ProfileMenu";
-
-// const Header = ({ onNotificationsClick }) => {
-//   const { searchQuery, setSearchQuery } = useSearch();
-//   const [localQuery, setLocalQuery] = useState(searchQuery);
-
-//   // Debounce: wait 300ms before syncing to global search
-//   useEffect(() => {
-//     const timeout = setTimeout(() => {
-//       setSearchQuery(localQuery);
-//     }, 300);
-//     return () => clearTimeout(timeout);
-//   }, [localQuery, setSearchQuery]);
-
-//   const handleSearchChange = (e) => setLocalQuery(e.target.value);
-
-//   const handleNotifications =
-//     onNotificationsClick || (() => alert("Notifications Clicked!"));
-
-//   return (
-//     <header className="flex w-full items-center justify-between border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-slate-900/90 backdrop-blur">
-//       {/* Left: Logo */}
-//       <div className="flex items-center gap-2">
-//         <div className="size-6 text-blue-600">
-//           <svg
-//             fill="currentColor"
-//             viewBox="0 0 48 48"
-//             xmlns="http://www.w3.org/2000/svg"
-//           >
-//             <path d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z" />
-//           </svg>
-//         </div>
-//         <h1 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white sm:text-lg">
-//           Civic Connect
-//         </h1>
-//       </div>
-
-//       {/* Middle: Search Bar */}
-//       <div className="flex flex-1 justify-end px-6">
-//         <div className="relative w-full max-w-md">
-//           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-gray-400 dark:text-gray-400">
-//             search
-//           </span>
-//           <input
-//             type="text"
-//             placeholder="Search for issues, locations..."
-//             value={localQuery}
-//             onChange={handleSearchChange}
-//             className="w-full rounded-lg bg-gray-100 py-2 pl-10 pr-4 text-sm text-gray-700 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-200 dark:placeholder:text-gray-400"
-//           />
-//         </div>
-//       </div>
-
-//       {/* Right: Notifications + Profile */}
-//       <div className="flex items-center gap-4">
-//         {/* Notifications Button */}
-//         <button
-//           onClick={handleNotifications}
-//           className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
-//           aria-label="View notifications"
-//         >
-//           <span className="material-symbols-outlined text-[20px] text-gray-700 dark:text-gray-200">
-//             notifications
-//           </span>
-//         </button>
-
-//         {/* Profile Menu */}
-//         <ProfileMenu
-//           user={{
-//             name: "Utkarsh Raikwar",
-//             avatar: "https://api.dicebear.com/8.x/thumbs/svg?seed=Utkarsh",
-//           }}
-//         />
-//       </div>
-//     </header>
-//   );
-// };
-
-// export default Header;
-
 import React, { useState, useEffect } from "react";
 import { useSearch } from "../context/SearchContext";
 import ProfileMenu from "./ProfileMenu";
@@ -155,12 +73,7 @@ const Header = ({ onNotificationsClick }) => {
           </span>
         </button>
 
-        <ProfileMenu
-          user={{
-            name: "Utkarsh Raikwar",
-            avatar: "https://api.dicebear.com/8.x/thumbs/svg?seed=Utkarsh",
-          }}
-        />
+        <ProfileMenu />
       </div>
 
       {/* Mobile Search Input Overlay */}
@@ -188,3 +101,126 @@ const Header = ({ onNotificationsClick }) => {
 };
 
 export default Header;
+
+// import React, { useState, useEffect } from "react";
+// import { useSearch } from "../context/SearchContext";
+// import ProfileMenu from "./ProfileMenu";
+// import { useNavigate } from "react-router-dom";
+
+// const Header = ({ onNotificationsClick }) => {
+//   const navigate = useNavigate();
+//   const { searchQuery, setSearchQuery } = useSearch();
+//   const [localQuery, setLocalQuery] = useState(searchQuery);
+//   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+//   // Debounce search updates
+//   useEffect(() => {
+//     const timeout = setTimeout(() => {
+//       setSearchQuery(localQuery);
+//     }, 300);
+//     return () => clearTimeout(timeout);
+//   }, [localQuery, setSearchQuery]);
+
+//   const handleSearchChange = (e) => setLocalQuery(e.target.value);
+
+//   const handleNotifications =
+//     onNotificationsClick || (() => alert("Notifications Yet to come!"));
+
+//   return (
+//     <header className="flex w-full items-center justify-between border-b border-gray-200 bg-white px-4 py-3 sm:px-6 dark:border-gray-800 dark:bg-slate-900/90 backdrop-blur sticky top-0 z-30">
+//       {/* Left: Logo */}
+//       <div className="flex items-center gap-2">
+//         <div className="size-7 text-blue-600">
+//           <svg fill="currentColor" viewBox="0 0 48 48">
+//             <path d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z" />
+//           </svg>
+//         </div>
+//         <h1 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
+//           Civic Connect
+//         </h1>
+//       </div>
+
+//       {/* Middle: Desktop Search Bar */}
+//       <div className="hidden md:flex flex-1 justify-end px-6">
+//         <div className="relative w-full max-w-xl">
+//           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-gray-400 dark:text-gray-400">
+//             search
+//           </span>
+//           <input
+//             type="text"
+//             placeholder="Search for issues, locations..."
+//             value={localQuery}
+//             onChange={handleSearchChange}
+//             className="w-full rounded-xl bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 transition"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Right: Actions */}
+//       <div className="flex items-center gap-2 sm:gap-3">
+//         {/* Mobile Search Icon */}
+//         <button
+//           className="md:hidden flex items-center justify-center rounded-full p-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+//           onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+//         >
+//           <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
+//             search
+//           </span>
+//         </button>
+
+//         {/* Post Issue Button (text on desktop, icon on mobile) */}
+//         <button
+//           onClick={() => navigate("/create")}
+//           className="flex items-center justify-center gap-1 rounded-full bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 active:scale-95 md:rounded-lg"
+//         >
+//           <span className="material-symbols-outlined text-[20px]">
+//             add_circle
+//           </span>
+//           <span className="hidden sm:inline">Post Issue</span>
+//         </button>
+
+//         {/* Notifications */}
+//         <button
+//           onClick={handleNotifications}
+//           className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+//           aria-label="View notifications"
+//         >
+//           <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
+//             notifications
+//           </span>
+//         </button>
+
+//         {/* Profile Menu */}
+//         <ProfileMenu
+//           user={{
+//             name: "Utkarsh Raikwar",
+//             avatar: "https://api.dicebear.com/8.x/thumbs/svg?seed=Utkarsh",
+//           }}
+//         />
+//       </div>
+
+//       {/* Mobile Search Overlay */}
+//       {mobileSearchOpen && (
+//         <div className="absolute inset-0 bg-white dark:bg-slate-900 px-4 pt-3 pb-2 z-20 flex items-center gap-3 md:hidden">
+//           <input
+//             type="text"
+//             placeholder="Search for issues, locations..."
+//             value={localQuery}
+//             onChange={handleSearchChange}
+//             className="flex-1 rounded-xl bg-gray-100 py-2.5 pl-4 pr-4 text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-100 dark:placeholder:text-gray-400 transition"
+//           />
+//           <button
+//             className="flex items-center justify-center rounded-full p-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition"
+//             onClick={() => setMobileSearchOpen(false)}
+//           >
+//             <span className="material-symbols-outlined text-[22px] text-gray-700 dark:text-gray-200">
+//               close
+//             </span>
+//           </button>
+//         </div>
+//       )}
+//     </header>
+//   );
+// };
+
+// export default Header;

@@ -101,7 +101,7 @@ const updateIssueStatus = asyncHandler(async (req, res) => {
   if (issue.notifyByEmail && issue.email) {
     await sendEmail(
       issue.email,
-      "Civix - Issue Status Update",
+      "CivicConnect - Issue Status Update",
       `<p>Your issue <strong>${issue.title}</strong> is now <strong>${newStatus}</strong>.</p>`
     );
   }

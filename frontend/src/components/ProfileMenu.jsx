@@ -4,7 +4,7 @@ import { LogIn, User, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-const ProfileMenu = ({ user }) => {
+const ProfileMenu = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -77,13 +77,14 @@ const ProfileMenu = ({ user }) => {
       >
         <img
           src={
-            user?.avatar || "https://api.dicebear.com/8.x/thumbs/svg?seed=User"
+            userInfo?.user?.profilePictureUrl ||
+            "https://api.dicebear.com/8.x/thumbs/svg?seed=User"
           }
           alt="profile"
           className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-300 dark:ring-slate-700"
         />
         <span className="font-medium text-sm">
-          {user?.username || "Profile"}
+          {userInfo?.user?.username || "Profile"}
         </span>
       </button>
 

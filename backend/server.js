@@ -70,14 +70,13 @@ const profileRoutes = require("./routes/profileRoutes.js");
 // const contributionsRoutes = require("./routes/contributions.js");
 
 // CSRF token endpoint
-app.get("/api/csrf-token", (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
+// app.get("/api/csrf-token", (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() });
+// });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/issues", issueRoutes);
 app.use("/api/profile", profileRoutes);
-// app.use("/api/contributors", contributionsRoutes);
 
 // === Swagger API Docs ===
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));

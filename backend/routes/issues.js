@@ -7,7 +7,7 @@ const { upload } = require("../middlewares/multer.middleware");
 router.post(
   // post issue
   "/",
-  verifyToken, // verifyToken,
+  verifyToken,
   upload.single("file"),
   issueController.createIssue
 );
@@ -25,6 +25,7 @@ router.patch(
   isAdmin,
   issueController.updateIssueStatus //update issue status
 );
+
 //later update
 router.patch("/:id", issueController.updateIssue);
 
