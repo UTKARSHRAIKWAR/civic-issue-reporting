@@ -5,12 +5,9 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
 
-const socket = io(
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
-  {
-    withCredentials: true,
-  }
-);
+const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000", {
+  withCredentials: true,
+});
 
 const Comments = ({ issueId }) => {
   const [comments, setComments] = useState([]);
@@ -29,7 +26,8 @@ const Comments = ({ issueId }) => {
   };
 
   // Socket.io listeners
-  useEffect(() => { //
+  useEffect(() => {
+    //
     if (!issueId) return;
     socket.emit("joinIssue", issueId);
 
