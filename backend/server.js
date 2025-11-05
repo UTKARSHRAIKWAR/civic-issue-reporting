@@ -159,7 +159,7 @@ app.use("/api/issues", issueRoutes);
 app.use("/api/profile", profileRoutes);
 
 // === Swagger Docs ===
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs)); //api doc
 
 // === Error Handlers ===
 app.use(csrfErrorHandler);
