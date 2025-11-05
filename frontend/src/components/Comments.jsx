@@ -29,7 +29,7 @@ const Comments = ({ issueId }) => {
   };
 
   // Socket.io listeners
-  useEffect(() => {
+  useEffect(() => { //
     if (!issueId) return;
     socket.emit("joinIssue", issueId);
 
